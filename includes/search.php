@@ -146,9 +146,9 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 		if (!empty($row['freetext'])) {
 			$short = 'Personal text: <i>' . htmlspecialchars(substr($row['freetext'], 0, 120)) . '</i>';
 			if (strlen($row['freetext']) > 120) {
-				$fulltext = '<a href="javascript:showText(' . $showProfileCounter . ', \'<i>' . htmlspecialchars($row['freetext']) . '</i>\');">... more</a>.';
+				$fulltext = '<a href="javascript:showText(' . $showProfileCounter . ');">... more</a>.';
 			}
-			$freetext = ' <span id=freetext' . $showProfileCounter . '>' . $short . $fulltext . '</span> ';
+			$freetext = ' <span style="display:none;" id=freetext' . $showProfileCounter . '><i>' . htmlspecialchars($row['freetext']) . '</i></span><span id=shorttext' . $showProfileCounter . '>' . $short . $fulltext . '</span> ';
 		}
 
 		$gender = ', ';

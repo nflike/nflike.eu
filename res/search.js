@@ -1,5 +1,6 @@
-function showText(divid, text) {
-	document.getElementById('freetext' + divid).innerHTML = text;
+function showText(divid) {
+	document.getElementById('freetext' + divid).style.display = 'inline';
+	document.getElementById('shorttext' + divid).style.display = 'none';
 }
 
 function hideuser(id) {
