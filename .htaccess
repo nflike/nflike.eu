@@ -1,0 +1,16 @@
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RedirectMatch 404 /\.git
+RedirectMatch 404 /includes
+
+RewriteEngine On
+RewriteRule ^login index.php?page=login
+RewriteRule ^admin index.php?page=admin
+RewriteRule ^changelogin index.php?page=changelogin
+RewriteRule ^logout index.php?page=logout
+RewriteRule ^changeprofile index.php?page=changeprofile
+RewriteRule ^msgmods index.php?page=msgmods
+RewriteRule ^async index.php?page=async
+

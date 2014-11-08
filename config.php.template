@@ -1,0 +1,13 @@
+<?php 
+
+define('PATH', '/');
+
+$db = new mysqli('DBHOST', 'DBUSER', 'DBPASS', 'DBNAME');
+if ($db->connect_error) {
+	die('Database connection failed. Please try again.');
+}
+
+session_start();
+
+require('includes/functions.php');
+
