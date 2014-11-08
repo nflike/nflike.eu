@@ -29,6 +29,8 @@
 	$pagetitle = 'Admin - NFLike';
 	require('includes/header.php');
 ?>
+<input type=button value='Return to site' onclick='location="<?php echo PATH; ?>";'><br/><br/>
+
 <form method=POST action="<?php echo PATH; ?>admin">
 	<?php echoCSRFToken(); ?>
 	<b>Create a new account</b><br/>

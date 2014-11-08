@@ -2,7 +2,7 @@
 	if (isset($_POST['message'])) {
 		checkCSRF();
 		mail('nflike-msgform@lucb1e.com', 'NFL-MSGFORM Notification', ':)', 'From: site-automailer@lucb1e.com') or die('Failed to send your message (error 1094) :(');
-		$db->query('INSERT INTO adminmsgs VALUES(' . $_SESSION['userid'] . ', ' . time() . ', "' . $db->escape_string($_POST['message']) . '")') or die('Failed to send your message (error 8419) :(');
+		$db->query('INSERT INTO adminmsgs (userid, datetime, message) VALUES(' . $_SESSION['userid'] . ', ' . time() . ', "' . $db->escape_string($_POST['message']) . '")') or die('Failed to send your message (error 8419) :(');
 		echo '<span class=success>Your message has been sent.</span> <a href="' . PATH . '">Return to site?</a><br/><br/>';
 	}
 ?>
