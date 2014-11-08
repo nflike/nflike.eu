@@ -31,25 +31,22 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 		echo '<b>Warning:</b> You are set to unavailable, others cannot find you. You can change this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
 	else if ($userinfo['gender'] == 0) {
-		echo '<b>Warning:</b> You did not specify your gender yet, others cannot find you. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
+		echo '<b>Warning:</b> You did not specify your gender yet, others may not be able to find you. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
 	else if ($userinfo['lookingfor'] == 0) {
 		echo 'Note: You did not specify whether you are looking for men, women or both. Showing all results. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
 
 	if ($userinfo['interestarea'] > 0) {
-		echo 'Note: Showing results up to ' . $userinfo['interestarea'] . 'km away. <a href="' . PATH . 'search?maxdist=0">Disable</a> or <a href="' . PATH . 'changeprofile">change</a>.<br/><br/>';
+		echo 'Note: Showing results up to ' . $userinfo['interestarea'] . 'km away. You can change this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
 
 	$whereclause = '';
 	if ($userinfo['lookingfor'] == 1) {
 		$whereclause .= '(gender = 1 OR gender = 3) AND ';
 	}
-	else if ($userinfo['lookingfor'] == 2) {
+	if ($userinfo['lookingfor'] == 2) {
 		$whereclause .= '(gender = 2 OR gender = 3) AND ';
-	}
-	else {
-		$whereclause .= 'gender != 0 AND ';
 	}
 
 	if ($userinfo['agefrom'] > 0) {
@@ -63,6 +60,15 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 	if ($userinfo['yob'] > 0) {
 		$whereclause .= '(' . $userinfo['yob'] . ' >= agefrom - 1 AND agefrom != 0) AND ';
 		$whereclause .= '(' . $userinfo['yob'] . ' <= ageto + 2 AND ageto != 0) AND ';
+	}
+
+	switch ($userinfo['gender']) {
+		case 1: // male
+			$whereclause .= '(lookingfor = 0 OR lookingfor = 1 OR lookingfor = 3) AND ';
+			break;
+		case 2: // female
+			$whereclause .= '(lookingfor = 0 OR lookingfor = 2 OR lookingfor = 3) AND ';
+			break;
 	}
 
 	$whereclause .= 'id NOT IN (SELECT hidden FROM hideresults WHERE userid = ' . $_SESSION['userid'] . ') AND ';
@@ -119,7 +125,11 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 		$showProfileCounter++;
 
 		if ($distance !== false) {
-			$distance = ", ~${distance}km. ";
+			$distance = round($distance);
+			$distance = ", ~${distance}km";
+		}
+		else {
+			$distance = '';
 		}
 
 		$unhide = '';
@@ -141,22 +151,21 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 			$freetext = ' <span id=freetext' . $showProfileCounter . '>' . $short . $fulltext . '</span> ';
 		}
 
+		$gender = ', ';
 		switch ($row['gender']) {
 			case 1:
-				$gender = 'male';
+				$gender .= 'male';
 				break;
 			case 2:
-				$gender = 'female';
+				$gender .= 'female';
 				break;
-			case 3:
 			default:
-				$gender = 'other';
-				break;
+				$gender = '';
 		}
 
 		$facebook = '<a href="' . htmlspecialchars($row['fburl']) . '"><img src="' . PATH . 'res/img/fb.png" height=18 width=18 alt="Facebook profile" title="Go to Facebook profile" border="0"/></a> ';
 
-		echo htmlspecialchars($row['name']) . ', ' . $gender . ', ' . (date('Y') - $row['yob']) . '. ' . $distance . $facebook . $hide . $unhide . $freetext . '<br/>';
+		echo htmlspecialchars($row['name']) . $gender . ', ' . (date('Y') - $row['yob']) . $distance . '. ' . $facebook . $hide . $unhide . $freetext . '<br/>';
 	}
 
 	echo '<script src="' . PATH . 'res/search.js"></script><script>SECRET_SECURITY_TOKEN="' . $_SESSION['csrf'] . '", PATH="' . PATH . '";</script>';
