@@ -6,6 +6,8 @@ if ($_GET['page'] == 'login') {
 	exit;
 }
 
+//if ($_GET['autologin']
+
 require('includes/checklogin.php');
 
 switch ($_GET['page']) {
@@ -40,6 +42,7 @@ switch ($_GET['page']) {
 
 	case 'search':
 	default:
+		require('includes/matchfunctions.php');
 		require('includes/search.php');
 }
 

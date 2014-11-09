@@ -17,15 +17,7 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 <br/>
 
 <?php 
-	$userinfo = $db->query('SELECT interestarea, available, lookingfor, gender, latitude, longitude, agefrom, ageto FROM users WHERE id = ' . $_SESSION['userid']) or die('Database error 74857. Please try again.');
-	if ($userinfo->num_rows != 1) {
-		die('Something weird happened. You have been logged out for security reasons. Please <a href="' . PATH . 'login">log in</a> again.');
-	}
-	$userinfo = $userinfo->fetch_array();
-
-	if (isset($_GET['maxdist'])) {
-		$userinfo['interestarea'] = $_GET['maxdist'];
-	}
+	$userinfo = match_db_getouruser();
 
 	if ($userinfo['available'] != '1') {
 		echo '<b>Warning:</b> You are set to unavailable, others cannot find you. You can change this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
@@ -41,89 +33,63 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 		echo 'Note: Showing results up to ' . $userinfo['interestarea'] . 'km away. You can change this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
 
-	$whereclause = '';
-	if ($userinfo['lookingfor'] == 1) {
-		$whereclause .= '(gender = 1 OR gender = 3) AND ';
-	}
-	if ($userinfo['lookingfor'] == 2) {
-		$whereclause .= '(gender = 2 OR gender = 3) AND ';
-	}
+	$users = match_db_getusers($userinfo);
+	list($users, $justoutside) = match_filter_distance($users, $userinfo['interestarea']);
+	list($users, $justoutside) = match_filter_age($users, $userinfo['yobfrom'], $userinfo['yobto']);
+	$users = match_filter_gender($users, $userinfo['lookingfor'], $userinfo['gender']);
 
-	if ($userinfo['agefrom'] > 0) {
-		$whereclause .= '(yob <= ' . $userinfo['agefrom'] . ' + 2 AND yob != 0) AND ';
-	}
+	list($justoutside, $justoutside2) = match_filter_age($justoutside, $userinfo['yobfrom'], $userinfo['yobto']);
+	$justoutside = array_merge($justoutside, $justoutside2);
+	unset($justoutside2);
+	$justoutside = match_filter_gender($justoutside, $userinfo['lookingfor'], $userinfo['gender']);
 
-	if ($userinfo['ageto'] > 0) {
-		$whereclause .= '(yob >= ' . $userinfo['ageto'] . ' - 1 AND yob != 0) AND ';
-	}
+	shuffle($users);
+	usort($users, "match_sort_distance");
+	usort($users, "match_sort_age");
+	usort($users, "match_sort_gender");
+	
+	shuffle($justoutside);
+	usort($justoutside, "match_sort_distance");
+	usort($justoutside, "match_sort_age");
+	usort($justoutside, "match_sort_gender");
 
-	if ($userinfo['yob'] > 0) {
-		$whereclause .= '(' . $userinfo['yob'] . ' >= agefrom - 1 AND agefrom != 0) AND ';
-		$whereclause .= '(' . $userinfo['yob'] . ' <= ageto + 2 AND ageto != 0) AND ';
-	}
-
-	switch ($userinfo['gender']) {
-		case 1: // male
-			$whereclause .= '(lookingfor = 0 OR lookingfor = 1 OR lookingfor = 3) AND ';
-			break;
-		case 2: // female
-			$whereclause .= '(lookingfor = 0 OR lookingfor = 2 OR lookingfor = 3) AND ';
-			break;
-	}
-
-	$whereclause .= 'id NOT IN (SELECT hidden FROM hideresults WHERE userid = ' . $_SESSION['userid'] . ') AND ';
-
-	$result = $db->query('SELECT id, name, fburl, latitude, longitude, gender, yob, freetext '
-		. 'FROM users WHERE ' . $whereclause . ' available = 1 AND id != ' . $_SESSION['userid'] . ' ORDER BY RAND()') or die('Database error 598128');
-	if ($result->num_rows > 0) {
+	if (count($users) > 0) {
 		$first = true;
-		while ($row = $result->fetch_array()) {
-			if (($row['latitude'] == 0 && $row['longitude'] == 0) || ($userinfo['latitude'] == 0 && $userinfo['longitude'] == 0)) {
-				$distance = false;
+		foreach ($users as $row) {
+			if ($first) {
+				$first = false;
+				echo '<b>A selection of awesome Nerdfighters for you:</b><br/>';
 			}
-			else {
-				$distance = coordToKmDistance($row['latitude'], $row['longitude'], $userinfo['latitude'], $userinfo['longitude']);
-			}
-
-			if ($row['yob'] > $userinfo['agefrom'] || $row['yob'] < $userinfo['ageto']) {
-				$hiddenusers[] = [$row, $distance];
-			}
-			else if ($distance === false || ($userinfo['interestarea'] != 0 && $distance <= $userinfo['interestarea'])) {
-				if ($first) {
-					$first = false;
-					echo '<b>A selection of awesome Nerdfighters for you:</b><br/>';
-				}
-				showProfile($row, $distance);
-			}
-			else {
-				$hiddenusers[] = [$row, $distance];
-			}
+			showProfile($row);
 		}
 	}
 	if (!isset($showProfileCounter)) {
 		echo '<b>We could not find any available Nerdfighters that match your requirements (or whose requirements you meet).</b><br/><br/>';
 	}
 
-	$result = $db->query('SELECT id, name, fburl, gender, yob, freetext FROM hideresults hr INNER JOIN users u ON u.id = hr.hidden WHERE hr.userid = ' . $_SESSION['userid']) or die('Database error 7184492');
-	if ($result->num_rows > 0 || count($hiddenusers) > 0) {
-		echo '<b>Hidden users</b> (you previously hid them, they are outside your distance limit or their age is just outside what you are looking for)<br/>';
-		if (count($hiddenusers) > 0) {
-			foreach ($hiddenusers as $i) {
-				showProfile($i[0], $i[1], false);
-			}
-		}
-		while ($row = $result->fetch_array()) {
-			showProfile($row, false, false, true);
+	if (count($justoutside) > 0) {
+		echo '<b>Other users</b> (they are <i>just</i> outside what you are looking for)<br/>';
+		foreach ($justoutside as $row) {
+			showProfile($row, false);
 		}
 	}
 
-	function showProfile($row, $distance, $canhide = true, $hidden = false) {
+	$hiddenusers = match_db_gethiddenusers($userinfo);
+	if (count($hiddenusers) > 0) {
+		echo '<b>Hidden users</b> (you previously hid them)<br/>';
+		foreach ($hiddenusers as $row) {
+			showProfile($row, false, true);
+		}
+	}
+
+	function showProfile($row, $canhide = true, $hidden = false) {
 		global $showProfileCounter;
 		if (!isset($showProfileCounter)) {
 			$showProfileCounter = -1;
 		}
 		$showProfileCounter++;
 
+		$distance = $row['distance'];
 		if ($distance !== false) {
 			$distance = round($distance);
 			$distance = ", ~${distance}km";

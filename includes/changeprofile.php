@@ -26,17 +26,17 @@
 			$latitude = floatval($_POST['latitude']);
 			$interestarea = intval($_POST['interestarea']);
 			$yob = intval($_POST['yob']);
-			if ($_POST['agefrom'] == 'any') {
-				$_POST['agefrom'] = date('Y');
+			if ($_POST['yobfrom'] == 'any') {
+				$_POST['yobfrom'] = 0;
 			}
 			else {
-				$agefrom = date('Y') - intval($_POST['agefrom']);
+				$yobfrom = date('Y') - intval($_POST['yobfrom']);
 			}
-			if ($_POST['ageto'] == 'any') {
-				$_POST['ageto'] = 0;
+			if ($_POST['yobto'] == 'any') {
+				$_POST['yobto'] = date('Y');
 			}
 			else {
-				$ageto = date('Y') - intval($_POST['ageto']);
+				$yobto = date('Y') - intval($_POST['yobto']);
 			}
 			$available = isset($_POST['available']) ? 1 : 0;
 			
@@ -50,8 +50,8 @@
 			$query .= 'available = "' . $available . '", ';
 			$query .= 'freetext = "' . $freetext . '", ';
 			$query .= 'yob = "' . $yob . '", ';
-			$query .= 'agefrom = "' . $agefrom . '", ';
-			$query .= 'ageto = "' . $ageto . '" ';
+			$query .= 'yobfrom = "' . $yobfrom . '", ';
+			$query .= 'yobto = "' . $yobto . '" ';
 			$query .= 'WHERE id = ' . $_SESSION['userid'];
 			$db->query($query) or die('Database error 518093. Please try that again.');
 			echo '<span class=success>Updated!</span> <a href="' . PATH . '">Return to the main page?</a><br/><br/>';
@@ -59,7 +59,7 @@
 		}
 	}
 
-	$userinfo = $db->query('SELECT fburl, agefrom, ageto, yob, interestarea, available, freetext, gender, lookingfor, longitude, latitude '
+	$userinfo = $db->query('SELECT fburl, yobfrom, yobto, yob, interestarea, available, freetext, gender, lookingfor, longitude, latitude '
 		. 'FROM users WHERE id = ' . $_SESSION['userid']) or die('Database error 91041. Please try again.');
 	if ($userinfo->num_rows != 1) {
 		session_destroy();
@@ -68,13 +68,13 @@
 	$userinfo = $userinfo->fetch_array();
 	$displayname = htmlspecialchars($_SESSION['name']);
 	$yob = intval($userinfo['yob']);
-	$agefrom = date('Y') - intval($userinfo['agefrom']);
-	$ageto = date('Y') - intval($userinfo['ageto']);
-	if ($agefrom == date('Y') || $agefrom == 0) {
-		$agefrom = 'any';
+	$yobfrom = date('Y') - intval($userinfo['yobfrom']);
+	$yobto = date('Y') - intval($userinfo['yobto']);
+	if ($yobfrom == date('Y') || $yobfrom == 0) {
+		$yobfrom = 'any';
 	}
-	if ($ageto == date('Y') || $ageto == 999) {
-		$ageto = 'any';
+	if ($yobto == date('Y') || $yobto == 0 || $yobto == 999) {
+		$yobto = 'any';
 	}
 	$available = $userinfo['available'] == 1;
 	$latitude = floatval($userinfo['latitude']);
@@ -100,7 +100,7 @@
 
 	Year of birth: <input name=yob size=4 maxlength=4 value="<?php echo $yob; ?>"> (to estimate your age)<br/><br/>
 
-	You are looking for someone between <input name=agefrom maxlength=3 value=<?php echo $agefrom;?> size=2> and <input name=ageto maxlength=3 value=<?php echo $ageto;?> size=2> years old.<br/><br/>
+	You are looking for someone between <input name=yobto maxlength=3 value=<?php echo $yobto;?> size=2> and <input name=yobfrom maxlength=3 value=<?php echo $yobfrom;?> size=2> years old.<br/><br/>
 
 	Your physical gender: <?php echo $physicalfeatures; ?> Please do not use "other" because it confuses the search. Only use it when necessary.<br/><br/>
 
