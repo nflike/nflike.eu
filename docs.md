@@ -1,6 +1,6 @@
 # Site documentation
 
-This is an internal document. Anyone can read it, but it's of no use to you.
+This is some documentation about the site's internals.
 
 ## Database
 
