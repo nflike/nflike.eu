@@ -8,6 +8,8 @@ The users.gender field can be 0 for undefined, 1 for male, 2 for female or 3 for
 
 The users.lookingfor field specifies which gender someone is looking for. This is 0 for undefined, 1 for male, 2 for female or 3 for both.
 
+Database error codes are random. The goal of this is that you can ctrl+f the source code for a given errorcode.
+
 ## Session
 
 The session contains the following keys:
