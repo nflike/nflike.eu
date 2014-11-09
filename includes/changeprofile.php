@@ -1,5 +1,5 @@
 <?php 
-	$pagetitle = 'Change profile - NerdFighterLike';
+	$pagetitle = 'Change profile - NerdfighterLike';
 	require('includes/header.php');
 
 	if (isset($_POST['name'])) {
@@ -26,8 +26,18 @@
 			$latitude = floatval($_POST['latitude']);
 			$interestarea = intval($_POST['interestarea']);
 			$yob = intval($_POST['yob']);
-			$agefrom = date('Y') - intval($_POST['agefrom']);
-			$ageto = date('Y') - intval($_POST['ageto']);
+			if ($_POST['agefrom'] == 'any') {
+				$_POST['agefrom'] = date('Y');
+			}
+			else {
+				$agefrom = date('Y') - intval($_POST['agefrom']);
+			}
+			if ($_POST['ageto'] == 'any') {
+				$_POST['ageto'] = 0;
+			}
+			else {
+				$ageto = date('Y') - intval($_POST['ageto']);
+			}
 			$available = isset($_POST['available']) ? 1 : 0;
 			
 			$query = 'UPDATE users SET ';
@@ -60,11 +70,11 @@
 	$yob = intval($userinfo['yob']);
 	$agefrom = date('Y') - intval($userinfo['agefrom']);
 	$ageto = date('Y') - intval($userinfo['ageto']);
-	if ($agefrom == date('Y')) {
-		$agefrom = 0;
+	if ($agefrom == date('Y') || $agefrom == 0) {
+		$agefrom = 'any';
 	}
-	if ($ageto == date('Y')) {
-		$ageto = 999;
+	if ($ageto == date('Y') || $ageto == 999) {
+		$ageto = 'any';
 	}
 	$available = $userinfo['available'] == 1;
 	$latitude = floatval($userinfo['latitude']);

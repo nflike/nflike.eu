@@ -1,5 +1,5 @@
 <?php 
-	$pagetitle = 'Reset password - NerdFighterLike';
+	$pagetitle = 'Reset password - NerdfighterLike';
 	require('header.php');
 
 	if (!empty($_POST['username'])) {
