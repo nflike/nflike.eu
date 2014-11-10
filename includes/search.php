@@ -66,12 +66,16 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 	if (!isset($showProfileCounter)) {
 		echo '<b>We could not find any available Nerdfighters that match your requirements (or whose requirements you meet).</b><br/><br/>';
 	}
+	else {
+		echo '<br/>';
+	}
 
 	if (count($justoutside) > 0) {
 		echo '<b>Other users</b> (they are <i>just</i> outside what you are looking for)<br/>';
 		foreach ($justoutside as $row) {
 			showProfile($row, false);
 		}
+		echo '<br/>';
 	}
 
 	$hiddenusers = match_db_gethiddenusers($userinfo);
