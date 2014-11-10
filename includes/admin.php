@@ -7,7 +7,7 @@
 		$fburl = $db->escape_string($_POST['fburl']);
 
 		$result = $db->query('INSERT INTO users (username, `password`, fburl) VALUES("' . $username . '", "' . $password . '", "' . $fburl . '")') or die('Database query error 89123. Does the username already exist?');
-		echo '<span class=success>Created. Password: ' . $displaypwd . '</span><br/><br/>';
+		echo '<span class=success>Created. Give them this link:</span> http://nflike.eu' . PATH . '?autologin=' . urlencode($_POST['createusername']) . '&pwd=' . $displaypwd . '&e<br/><br/>';
 	}
 
 	if (isset($_POST['resetpassword'])) {

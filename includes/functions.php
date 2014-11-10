@@ -13,13 +13,34 @@ function pwGen() {
 		}
 	}
 	if (strlen($out) < 7) {
-		return "ERROR";
+		return pwGen();
 	}
 	return $out;
 }
 
 function hashpwd($password) {
 	return '0' . hash('sha256', hash('sha256', $password . $password . 'ahyob5u71o3i4j', true) . 'b76A2');
+}
+
+function checkLogin($username, $password) {
+	global $db;
+
+	$username = $db->escape_string($username);
+	$password = hashpwd($password);
+
+	$result = $db->query('SELECT id, isadmin, username, `name` FROM users WHERE username = "' . $username . '" AND `password` = "' . $password . '"') or die('Epic Database Fail :( I\'m sorry about this, please try again.');
+
+	if ($result->num_rows == 1) {
+		$row = $result->fetch_row();
+		$_SESSION['userid'] = $row[0];
+		$_SESSION['loggedin'] = true;
+		$_SESSION['csrf'] = hash('sha256', openssl_random_pseudo_bytes(7));
+		$_SESSION['isadmin'] = $row[1] == 1 ? true : false;
+		$_SESSION['username'] = $row[2];
+		$_SESSION['name'] = $row[3];
+		return true;
+	}
+	return false;
 }
 
 function checkCSRF($token = -1) {

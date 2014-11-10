@@ -20,11 +20,11 @@
 		if ($ok) {
 			$name = $db->escape_string($_POST['name']);
 			$freetext = $db->escape_string($_POST['freetext']);
-			$gender = intval($_POST['gender']);
-			$lookingfor = intval($_POST['lookingfor']);
+			$gender = min(3, max(0, intval($_POST['gender'])));
+			$lookingfor = min(3, max(0, intval($_POST['lookingfor'])));
 			$longitude = floatval($_POST['longitude']);
 			$latitude = floatval($_POST['latitude']);
-			$interestarea = intval($_POST['interestarea']);
+			$interestarea = max(0, intval($_POST['interestarea']));
 			$yob = intval($_POST['yob']);
 			if ($_POST['yobfrom'] == 'any') {
 				$_POST['yobfrom'] = 0;
@@ -92,7 +92,8 @@
 
 <form method=POST action="<?php echo PATH; ?>changeprofile">
 	<?php echoCSRFToken(); ?>
-	To change your username or password, use <a href='<?php echo PATH; ?>changelogin'>this page</a>.<br/><br/>
+	To change your username or password, use <a href='<?php echo PATH; ?>changelogin'>this page</a>.<br/>
+	<a href='<?php echo PATH; ?>'>Click here</a> to return to the site.<br/><br/>
 	
 	Name: <input name=name value="<?php echo $displayname; ?>"> (this is not your username, but the name others see)<br/><br/>
 

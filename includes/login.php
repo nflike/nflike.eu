@@ -8,19 +8,7 @@
 	require('includes/header.php');
 
 	if (isset($_POST['name'])) {
-		$username = $db->escape_string($_POST['name']);
-		$password = hashpwd($_POST['pass']);
-
-		$result = $db->query('SELECT id, isadmin, username, `name` FROM users WHERE username = "' . $username . '" AND `password` = "' . $password . '"') or die('Epic Database Fail :( I\'m sorry about this, please try again.');
-
-		if ($result->num_rows == 1) {
-			$row = $result->fetch_row();
-			$_SESSION['userid'] = $row[0];
-			$_SESSION['loggedin'] = true;
-			$_SESSION['csrf'] = hash('sha256', openssl_random_pseudo_bytes(7));
-			$_SESSION['isadmin'] = $row[1] == 1 ? true : false;
-			$_SESSION['username'] = $row[2];
-			$_SESSION['name'] = $row[3];
+		if (checkLogin($_POST['name'], $_POST['pass'])) {
 			header('Location: ' . PATH);
 			exit;
 		}

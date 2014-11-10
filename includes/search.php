@@ -25,6 +25,9 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 	else if ($userinfo['gender'] == 0) {
 		echo '<b>Warning:</b> You did not specify your gender yet, others may not be able to find you. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
+	else if ($userinfo['yob'] == 0) {
+		echo '<b>Warning:</b> You did not specify your year of birth yet, others may not be able to find you. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
+	}
 	else if ($userinfo['lookingfor'] == 0) {
 		echo 'Note: You did not specify whether you are looking for men, women or both. Showing all results. You can set this in your <a href="' . PATH . 'changeprofile">profile settings</a>.<br/><br/>';
 	}
@@ -71,7 +74,7 @@ Hi <?php echo htmlspecialchars($name); ?>!<br/>
 	}
 
 	if (count($justoutside) > 0) {
-		echo '<b>Other users</b> (they are <i>just</i> outside what you are looking for)<br/>';
+		echo '<b>Other users</b> (they are close to what you are looking for)<br/>';
 		foreach ($justoutside as $row) {
 			showProfile($row, false);
 		}

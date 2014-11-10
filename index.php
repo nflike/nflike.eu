@@ -6,9 +6,22 @@ if ($_GET['page'] == 'login') {
 	exit;
 }
 
-//if ($_GET['autologin']
+if ($_GET['autologin']) {
+	if (checkLogin($_GET['autologin'], $_GET['pwd'])) {
+		require('includes/firstlogin.php');
+		exit;
+	}
+	else {
+		die('Your username or password were not correct. Did you copy the whole URL? Alternatively, try logging in <a href="' . PATH . 'login">here</a>.');
+	}
+}
 
 require('includes/checklogin.php');
+
+if (isset($_GET['firstuse'])) {
+	require('includes/firstlogin.php');
+	exit;
+}
 
 switch ($_GET['page']) {
 	case 'admin':
