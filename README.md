@@ -22,6 +22,10 @@ isadmin to 1, and use the password
 `0551e5f3768bdff43bad75167733ab978de25850027e3bea927017b26a00070fb`. You can
 now log in with your username and the password `tw1024`.
 
+If you installed the website in a subdirectory, like /nf-like/, then you must
+set the path to '/nf-like/' in config.php (include the leading and trailing
+slash!).
+
 ## Getting started
 
 The structure of the site is like this:
