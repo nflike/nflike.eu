@@ -43,8 +43,7 @@ The structure of the site is like this:
 2. Profile pictures.
 3. Find a better way to display custom texts.
 4. HTTPS certificate, HSTS and secure cookie.
-5. Last online tracking.
-6. Other gender field.
-7. Better sign-up process.
-8. Perhaps a messaging option? Should we require e-mail addresses for notifs?
+5. Other gender field.
+6. Better sign-up process.
+7. Perhaps a messaging option? Should we require e-mail addresses for notifs?
 
